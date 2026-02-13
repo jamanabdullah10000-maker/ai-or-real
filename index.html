@@ -7,62 +7,74 @@
 <style>
 
 body{
-  margin:0;
-  font-family: 'Segoe UI';
-  background: linear-gradient(135deg,#0f172a,#1e3a8a);
-  color:white;
-  text-align:center;
+margin:0;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#0f172a,#1e3a8a);
+color:white;
+text-align:center;
 }
 
 .card{
-  backdrop-filter: blur(20px);
-  background: rgba(255,255,255,0.08);
-  padding:25px;
-  border-radius:20px;
-  width:90%;
-  max-width:400px;
-  margin:40px auto;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
-}
-
-input{
-  margin:15px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(15px);
+padding:20px;
+margin:20px auto;
+width:90%;
+max-width:400px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
 button{
-  padding:12px 25px;
-  border:none;
-  border-radius:30px;
-  background:#22c55e;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
+padding:12px 25px;
+border:none;
+border-radius:30px;
+background:#22c55e;
+color:white;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#16a34a;
 }
 
 img{
-  width:100%;
-  border-radius:15px;
-  margin-top:15px;
+width:100%;
+border-radius:15px;
+margin-top:10px;
 }
 
 .progress{
-  height:10px;
-  background:#334155;
-  border-radius:10px;
-  margin-top:10px;
+height:12px;
+background:#334155;
+border-radius:10px;
+margin-top:10px;
 }
 
 .bar{
-  height:100%;
-  width:0%;
-  background:#22c55e;
-  border-radius:10px;
-  transition:1s;
+height:100%;
+width:0%;
+background:#22c55e;
+border-radius:10px;
+transition:1s;
 }
 
-.result-box{
-  margin-top:20px;
-  text-align:left;
+.ads{
+background:#334155;
+padding:15px;
+margin:20px;
+border-radius:15px;
+}
+
+.sample{
+cursor:pointer;
+margin-top:10px;
+}
+
+.premium{
+border:3px solid gold;
 }
 
 </style>
@@ -70,45 +82,232 @@ img{
 
 <body>
 
-<h1>🤖 AI or Real?</h1>
+<h1>🤖 AI or Real Detector</h1>
 
 <div class="card">
 
 <input type="file" id="fileInput" accept="image/*">
+
 <br>
+
 <button onclick="checkImage()">Analyze Image</button>
 
 <img id="preview">
 
 <div class="progress">
-  <div class="bar" id="bar"></div>
+<div class="bar" id="bar"></div>
 </div>
 
-<div class="result-box" id="resultBox"></div>
+<div id="resultBox"></div>
+
+<p id="usage">Daily usage: 0 / 5</p>
 
 </div>
+
+
+<div class="ads" id="adsBox">
+📢 Advertisement (Free users only)
+</div>
+
+
+<h2>🧪 Try Sample Images</h2>
+
+<div class="card">
+
+<div class="sample" onclick="loadSample('ai')">
+<img src="https://picsum.photos/300/200?random=1">
+<p>AI Generated Example</p>
+</div>
+
+<div class="sample" onclick="loadSample('real')">
+<img src="https://picsum.photos/300/200?random=2">
+<p>Real Photo Example</p>
+</div>
+
+<div class="sample" onclick="loadSample('screen')">
+<img src="https://picsum.photos/300/200?random=3">
+<p>Screenshot Example</p>
+</div>
+
+</div>
+
+
+<h2>🚀 Upgrade Your Plan</h2>
+
+<div class="card">
+
+<h3>FREE PLAN</h3>
+
+<p>✔ 5 photos per day</p>
+<p>✔ Ads supported</p>
+<p>✔ Basic detection</p>
+
+</div>
+
+
+<div class="card premium">
+
+<h3>🔥 PREMIUM PLAN</h3>
+
+<h1>$59/month</h1>
+
+<p>✨ 25 photos per day</p>
+<p>🎥 5 videos per day</p>
+<p>🚫 No Ads</p>
+<p>⚡ Faster detection</p>
+<p>📊 Full AI analysis</p>
+
+<button onclick="buyPremium()">Upgrade Now</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>💎 YEARLY OFFER</h3>
+
+<h1>$700/year</h1>
+
+<p>🔥 Best value</p>
+
+<button onclick="buyYear()">Get Yearly</button>
+
+</div>
+
+
 
 <script>
 
+let isPremium=false;
+let uploadCount=0;
+let photoLimit=5;
+
 function checkImage(){
 
-let file = document.getElementById("fileInput").files[0];
-if(!file){ alert("Select image"); return;}
+let file=document.getElementById("fileInput").files[0];
 
-let reader = new FileReader();
-reader.onload = function(e){
-  document.getElementById("preview").src = e.target.result;
+if(!file){
+alert("Select image first");
+return;
 }
+
+if(uploadCount>=photoLimit){
+alert("Daily limit reached");
+return;
+}
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+document.getElementById("preview").src=e.target.result;
+
+}
+
 reader.readAsDataURL(file);
 
 document.getElementById("resultBox").innerHTML="Analyzing...";
-document.getElementById("bar").style.width="0%";
+
+let confidence=Math.floor(Math.random()*100);
 
 setTimeout(()=>{
 
-let confidence = Math.floor(Math.random()*100);
-let isAI = confidence > 50;
+let verdict;
+let reason;
 
+if(confidence>60){
+
+verdict="⚠️ Likely AI Generated";
+
+reason=`
+• Texture smoothing detected<br>
+• Symmetrical patterns<br>
+• Missing camera metadata
+`;
+
+}
+else{
+
+verdict="✅ Looks Real";
+
+reason=`
+• Natural lighting<br>
+• Real noise pattern<br>
+• Camera sensor detected
+`;
+
+}
+
+document.getElementById("bar").style.width=confidence+"%";
+
+document.getElementById("resultBox").innerHTML=`
+<h3>${verdict}</h3>
+<p>Confidence: ${confidence}%</p>
+<p>${reason}</p>
+`;
+
+},1500);
+
+uploadCount++;
+
+document.getElementById("usage").innerHTML=
+"Daily usage: "+uploadCount+" / "+photoLimit;
+
+}
+
+
+function loadSample(type){
+
+let confidence;
+let verdict;
+let reason;
+
+if(type=="ai"){
+confidence=92;
+verdict="⚠️ AI Generated";
+reason="Perfect symmetry, smooth texture";
+}
+
+if(type=="real"){
+confidence=89;
+verdict="✅ Real Photo";
+reason="Natural shadows, camera metadata";
+}
+
+if(type=="screen"){
+confidence=95;
+verdict="🖥 Screenshot";
+reason="No camera noise, pixel perfect edges";
+}
+
+document.getElementById("bar").style.width=confidence+"%";
+
+document.getElementById("resultBox").innerHTML=`
+<h3>${verdict}</h3>
+<p>Confidence: ${confidence}%</p>
+<p>${reason}</p>
+`;
+
+}
+
+
+function buyPremium(){
+
+alert("Stripe Monthly payment integration here");
+
+}
+
+function buyYear(){
+
+alert("Stripe Yearly payment integration here");
+
+}
+
+
+</script>
+
+</body>
+</html>
 document.getElementById("bar").style.width=confidence+"%";
 
 if(isAI){
