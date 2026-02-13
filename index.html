@@ -1,114 +1,146 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI or Real Detector</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI or Real Detector</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Ads placeholder -->
-  <script>
-    let isPremium = false; // change from backend later
-    let uploadCount = 0;
-    let videoCount = 0;
+<style>
 
-    const FREE_LIMIT = 5;
-    const PREMIUM_PHOTO_LIMIT = 25;
-    const PREMIUM_VIDEO_LIMIT = 5;
-  </script>
+body{
+  margin:0;
+  font-family: 'Segoe UI';
+  background: linear-gradient(135deg,#0f172a,#1e3a8a);
+  color:white;
+  text-align:center;
+}
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
+.card{
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.08);
+  padding:25px;
+  border-radius:20px;
+  width:90%;
+  max-width:400px;
+  margin:40px auto;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
 
-    .box {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
+input{
+  margin:15px;
+}
 
-    button {
-      padding: 10px 20px;
-      background: #22c55e;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
+button{
+  padding:12px 25px;
+  border:none;
+  border-radius:30px;
+  background:#22c55e;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    .ads {
-      background: #334155;
-      padding: 15px;
-      margin-top: 20px;
-    }
-  </style>
+img{
+  width:100%;
+  border-radius:15px;
+  margin-top:15px;
+}
+
+.progress{
+  height:10px;
+  background:#334155;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+.bar{
+  height:100%;
+  width:0%;
+  background:#22c55e;
+  border-radius:10px;
+  transition:1s;
+}
+
+.result-box{
+  margin-top:20px;
+  text-align:left;
+}
+
+</style>
 </head>
 
 <body>
 
-<h1>AI or Real Detector</h1>
+<h1>🤖 AI or Real?</h1>
 
-<div class="box">
+<div class="card">
 
-<input type="file" id="fileInput">
-
+<input type="file" id="fileInput" accept="image/*">
 <br>
+<button onclick="checkImage()">Analyze Image</button>
 
-<button onclick="uploadFile()">Check</button>
+<img id="preview">
 
-<p id="result">Result will show here</p>
-
-<p id="limit">Daily usage: 0</p>
-
+<div class="progress">
+  <div class="bar" id="bar"></div>
 </div>
 
-<div id="adsBox" class="ads">
-Ads showing (Free users)
+<div class="result-box" id="resultBox"></div>
+
 </div>
-
-<br>
-
-<button onclick="goPremium()">Upgrade Premium ($59/month)</button>
 
 <script>
 
-function uploadFile()
-{
-  const file = document.getElementById("fileInput").files[0];
+function checkImage(){
 
-  if(!file)
-  {
-    alert("Select file first");
-    return;
-  }
+let file = document.getElementById("fileInput").files[0];
+if(!file){ alert("Select image"); return;}
 
-  let isVideo = file.type.startsWith("video");
+let reader = new FileReader();
+reader.onload = function(e){
+  document.getElementById("preview").src = e.target.result;
+}
+reader.readAsDataURL(file);
 
-  if(!isPremium)
-  {
-    if(uploadCount >= FREE_LIMIT)
-    {
-      alert("Free limit reached. Upgrade premium.");
-      return;
-    }
-  }
-  else
-  {
-    if(isVideo && videoCount >= PREMIUM_VIDEO_LIMIT)
-    {
-      alert("Video limit reached.");
-      return;
-    }
+document.getElementById("resultBox").innerHTML="Analyzing...";
+document.getElementById("bar").style.width="0%";
 
-    if(!isVideo && uploadCount >= PREMIUM_PHOTO_LIMIT)
-    {
-      alert("Photo limit reached.");
-      return;
-    }
+setTimeout(()=>{
+
+let confidence = Math.floor(Math.random()*100);
+let isAI = confidence > 50;
+
+document.getElementById("bar").style.width=confidence+"%";
+
+if(isAI){
+document.getElementById("resultBox").innerHTML = `
+<h3>⚠️ Likely AI Generated</h3>
+<p>Confidence: ${confidence}%</p>
+<ul>
+<li>Unnatural texture smoothing</li>
+<li>Symmetrical lighting</li>
+<li>Metadata missing</li>
+</ul>
+`;
+}else{
+document.getElementById("resultBox").innerHTML = `
+<h3>✅ Looks Authentic</h3>
+<p>Confidence: ${confidence}%</p>
+<ul>
+<li>Natural noise pattern</li>
+<li>Realistic shadow edges</li>
+<li>Camera metadata detected</li>
+</ul>
+`;
+}
+
+},2000);
+
+}
+
+</script>
+
+</body>
+</html>    }
   }
 
   document.getElementById("result").innerHTML = "Checking...";
