@@ -2,106 +2,139 @@
 <html>
 <head>
   <title>AI or Real Detector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Ads placeholder -->
+  <script>
+    let isPremium = false; // change from backend later
+    let uploadCount = 0;
+    let videoCount = 0;
+
+    const FREE_LIMIT = 5;
+    const PREMIUM_PHOTO_LIMIT = 25;
+    const PREMIUM_VIDEO_LIMIT = 5;
+  </script>
+
   <style>
-    body { font-family: Arial, sans-serif; text-align:center; padding:20px; }
-    #ads { display:none; border:1px solid #ccc; padding:10px; margin:10px; background:#f9f9f9; }
-    input, button { margin:5px; padding:10px; font-size:16px; }
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #22c55e;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .ads {
+      background: #334155;
+      padding: 15px;
+      margin-top: 20px;
+    }
   </style>
 </head>
+
 <body>
 
 <h1>AI or Real Detector</h1>
 
-<p>Upload a photo or video to detect AI/Real</p>
+<div class="box">
 
-<input type="file" id="fileInput"><br>
-<button onclick="uploadFile('photo')">Upload Photo</button>
-<button onclick="uploadFile('video')">Upload Video</button>
+<input type="file" id="fileInput">
 
-<div id="ads">Ad goes here for Free users</div>
+<br>
 
-<p id="result"></p>
+<button onclick="uploadFile()">Check</button>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<p id="result">Result will show here</p>
+
+<p id="limit">Daily usage: 0</p>
+
+</div>
+
+<div id="adsBox" class="ads">
+Ads showing (Free users)
+</div>
+
+<br>
+
+<button onclick="goPremium()">Upgrade Premium ($59/month)</button>
 
 <script>
-  // ===== Supabase Setup =====
-  const supabase = window.supabase.createClient(
-    "YOUR_PROJECT_URL",     // replace with your Supabase URL
-    "YOUR_ANON_KEY"         // replace with your Supabase anon key
-  );
 
-  // ===== Upload Function =====
-  async function uploadFile(type) { // type = 'photo' or 'video'
-      const file = document.getElementById("fileInput").files[0];
-      if(!file){ alert("Select a file"); return; }
+function uploadFile()
+{
+  const file = document.getElementById("fileInput").files[0];
 
-      const user = supabase.auth.user();
-      if(!user){ alert("Please login first"); return; }
-
-      // Fetch user data
-      const { data: userData } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', user.email)
-        .single();
-
-      const today = new Date().toISOString().split('T')[0];
-
-      // Reset daily counters
-      if(userData.last_upload_date !== today){
-        await supabase.from('users')
-          .update({ uploads_photo_day:0, uploads_video_day:0, last_upload_date: today })
-          .eq('email', user.email);
-        userData.uploads_photo_day = 0;
-        userData.uploads_video_day = 0;
-      }
-
-      // Determine limits
-      const photoLimit = userData.subscription === "premium" ? 25 : 5;
-      const videoLimit = userData.subscription === "premium" ? 5 : 0;
-
-      if(type === "photo" && userData.uploads_photo_day >= photoLimit){
-          alert(`Photo limit reached (${photoLimit}/day). Upgrade to premium.`);
-          return;
-      }
-
-      if(type === "video" && userData.uploads_video_day >= videoLimit){
-          alert(`Video limit reached (${videoLimit}/day). Upgrade to premium.`);
-          return;
-      }
-
-      // ===== Upload to Backend =====
-      const formData = new FormData();
-      formData.append("file", file);
-      const backendURL = "https://yourbackend.onrender.com/check"; // replace with your backend
-
-      try {
-          const response = await fetch(backendURL, { method:"POST", body: formData });
-          const result = await response.json();
-
-          document.getElementById("result").innerHTML =
-            `${result.result} (File: ${file.name})`;
-
-          // Update counters
-          const updateData = {};
-          if(type==="photo") updateData.uploads_photo_day = userData.uploads_photo_day +1;
-          if(type==="video") updateData.uploads_video_day = userData.uploads_video_day +1;
-
-          await supabase.from('users').update(updateData).eq('email', user.email);
-
-          // Show ads for free users
-          if(userData.subscription==="free") showAds(); else hideAds();
-
-      } catch (err){
-          document.getElementById("result").innerHTML = "Error uploading file!";
-          console.error(err);
-      }
+  if(!file)
+  {
+    alert("Select file first");
+    return;
   }
 
-  // ===== Ads Logic =====
-  function showAds(){ document.getElementById("ads").style.display = "block"; }
-  function hideAds(){ document.getElementById("ads").style.display = "none"; }
+  let isVideo = file.type.startsWith("video");
+
+  if(!isPremium)
+  {
+    if(uploadCount >= FREE_LIMIT)
+    {
+      alert("Free limit reached. Upgrade premium.");
+      return;
+    }
+  }
+  else
+  {
+    if(isVideo && videoCount >= PREMIUM_VIDEO_LIMIT)
+    {
+      alert("Video limit reached.");
+      return;
+    }
+
+    if(!isVideo && uploadCount >= PREMIUM_PHOTO_LIMIT)
+    {
+      alert("Photo limit reached.");
+      return;
+    }
+  }
+
+  document.getElementById("result").innerHTML = "Checking...";
+
+  // Fake detection (replace with real backend later)
+  setTimeout(()=>{
+  
+    let result = Math.random() > 0.5 ? "AI Generated" : "Real Photo";
+
+    document.getElementById("result").innerHTML = result;
+
+  },2000);
+
+  uploadCount++;
+
+  if(isVideo) videoCount++;
+
+  document.getElementById("limit").innerHTML =
+    "Used: " + uploadCount;
+
+}
+
+function goPremium()
+{
+  alert("Stripe integration will open here");
+}
 
 </script>
 
