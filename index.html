@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI or Real</title>
+</head>
+<body>
+
+<h1>AI or Real Detector</h1>
+
+<input type="file" id="fileInput">
+<button onclick="checkFile()">Check</button>
+
+<p id="result"></p>
+
+<script>
+function checkFile() {
+    const file = document.getElementById("fileInput").files[0];
+
+    if (!file) {
+        alert("Select a file first!");
+        return;
+    }
+
+    // Fake AI detection (random result)
+    const result = Math.random() > 0.5 ? "AI Generated" : "Real Image";
+
+    document.getElementById("result").innerHTML =
+        "Result: " + result + "<br>File: " + file.name;
+}
+</script>
+
+</body>
+</html>
