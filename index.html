@@ -100,15 +100,202 @@ border:3px solid gold;
 
 <div id="resultBox"></div>
 
-<p id="usage">Daily usage: 0 / 5</p>
+</div>
+
+
+<div class="ads">
+📢 Ads will show here (Free users)
+</div>
+
+
+<h2>🧪 Try Sample Images</h2>
+
+<div class="card">
+
+<div class="sample" onclick="loadSample('ai')">
+<img src="https://picsum.photos/300/200?random=1">
+<p>AI Generated Example</p>
+</div>
+
+<div class="sample" onclick="loadSample('real')">
+<img src="https://picsum.photos/300/200?random=2">
+<p>Real Photo Example</p>
+</div>
+
+<div class="sample" onclick="loadSample('screen')">
+<img src="https://picsum.photos/300/200?random=3">
+<p>Screenshot Example</p>
+</div>
 
 </div>
 
 
-<div class="ads" id="adsBox">
-📢 Advertisement (Free users only)
+<h2>🚀 Upgrade Your Plan</h2>
+
+<div class="card">
+<h3>FREE PLAN</h3>
+<p>✔ 5 photos per day</p>
+<p>✔ Ads supported</p>
 </div>
 
+
+<div class="card premium">
+
+<h3>🔥 PREMIUM PLAN</h3>
+
+<h1>$59/month</h1>
+
+<p>✨ 25 photos per day</p>
+<p>🎥 5 videos per day</p>
+<p>🚫 No Ads</p>
+<p>⚡ Faster detection</p>
+
+<button onclick="buyPremium()">Upgrade</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>💎 YEARLY OFFER</h3>
+
+<h1>$700/year</h1>
+
+<button onclick="buyYear()">Best Deal</button>
+
+</div>
+
+
+<script>
+
+
+async function checkImage(){
+
+let file=document.getElementById("fileInput").files[0];
+
+if(!file){
+alert("Select image first");
+return;
+}
+
+
+// preview image
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+document.getElementById("preview").src=e.target.result;
+
+}
+
+reader.readAsDataURL(file);
+
+
+document.getElementById("resultBox").innerHTML="Analyzing...";
+
+
+let formData=new FormData();
+
+formData.append("file",file);
+
+
+try{
+
+let response=await fetch("/api/check",{
+
+method:"POST",
+body:formData
+
+});
+
+
+let data=await response.json();
+
+
+document.getElementById("bar").style.width=data.confidence+"%";
+
+
+document.getElementById("resultBox").innerHTML=`
+
+<h3>${data.verdict}</h3>
+
+<p>Confidence: ${data.confidence}%</p>
+
+`;
+
+
+}catch(error){
+
+document.getElementById("resultBox").innerHTML=
+
+"Error analyzing image";
+
+}
+
+
+}
+
+
+
+function loadSample(type){
+
+let confidence;
+let verdict;
+let reason;
+
+if(type=="ai"){
+confidence=92;
+verdict="⚠️ AI Generated";
+reason="Perfect symmetry and texture smoothing";
+}
+
+if(type=="real"){
+confidence=89;
+verdict="✅ Real Photo";
+reason="Natural lighting and camera noise";
+}
+
+if(type=="screen"){
+confidence=96;
+verdict="🖥 Screenshot";
+reason="No camera metadata";
+}
+
+
+document.getElementById("bar").style.width=confidence+"%";
+
+document.getElementById("resultBox").innerHTML=`
+
+<h3>${verdict}</h3>
+
+<p>Confidence: ${confidence}%</p>
+
+<p>${reason}</p>
+
+`;
+
+}
+
+
+
+function buyPremium(){
+
+alert("Stripe Monthly integration here");
+
+}
+
+
+function buyYear(){
+
+alert("Stripe Yearly integration here");
+
+}
+
+
+</script>
+
+</body>
+</html>
 
 <h2>🧪 Try Sample Images</h2>
 
