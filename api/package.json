@@ -1,7 +1,14 @@
 {
-  "name": "ai-or-real",
+  "name": "ai-or-real-backend",
+  "version": "1.0.0",
+  "description": "Backend for AI or Real Detector website",
+  "main": "check.js",
+  "scripts": {
+    "start": "node api/check.js"
+  },
   "dependencies": {
     "formidable": "^3.5.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "form-data": "^4.0.0"
   }
 }
